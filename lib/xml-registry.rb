@@ -33,6 +33,10 @@ class XMLRegistry
   def get_key(path)
     XPath.first(@doc.root, path)
   end
+  
+  def get_keys(path)
+    XPath.match(@doc.root, path)
+  end        
 
   def delete_key(path)
     node = XPath.first(@doc.root, path)
