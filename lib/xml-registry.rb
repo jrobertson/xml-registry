@@ -5,7 +5,7 @@
 require 'rexml/document'
 include REXML
 
-class Registry
+class XMLRegistry
 
   def initialize()
     super()
