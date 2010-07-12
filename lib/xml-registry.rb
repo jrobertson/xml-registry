@@ -8,6 +8,7 @@ include REXML
 class Registry
 
   def initialize()
+    super()
     @template = '<root><system/><app/><user/><ip_address/></root>'
     @doc = Document.new(@template)
   end
