@@ -53,7 +53,7 @@ class XMLRegistry
   end
 
   def save(s)
-    File.open(s){|f| f.write @doc.xml}
+    File.open(s, 'w'){|f| f.write @doc.xml}
   end
 
   def import(s)      
