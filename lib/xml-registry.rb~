@@ -6,6 +6,8 @@ require 'rexle'
 
 class XMLRegistry
 
+  attr_reader :doc
+  
   def initialize()
     super()
     @template = '<root><system/><app/><user/><ip_address/></root>'
@@ -50,6 +52,7 @@ class XMLRegistry
 
   def load_xml(s='')      
     @doc = Rexle.new(read(s))          
+    self
   end
 
   def save(s)

@@ -63,7 +63,7 @@ class XMLRegistry
     reg_buffer = read(s)
 
     reg_items = reg_buffer.gsub(/\n/,'').split(/(?=\[.[^\]]+\])/).map do |x| 
-      [x[/^\[(.[^\]]+)\]/,1], Hash[*($').scan(/"([^"]+)"="(.[^"]+)?"/).flatten]]
+      [x[/^\[(.[^\]]+)\]/,1], Hash[*($').scan(/"([^"]+)"="(.[^"]*)"/).flatten]]
     end
 
     reg_items.each do |path, items|
