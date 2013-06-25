@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 
 # file: xml-registry.rb
 
@@ -8,20 +8,30 @@ class XMLRegistry
 
   attr_reader :doc
   
-  def initialize()
+  def initialize(template = '<root></root>')
     super()
-    @template = '<root><system/><app/><user/><ip_address/></root>'
+    @template = template
     @doc = Rexle.new(@template)
   end
 
-  def initialise_registry()
-    @doc = Rexle.new(@template)
+  # Creates a new registry document from scratch. Optional param: string XML template
+  # example: initialise_registry('<root><app/></root>')
+  #
+  def initialise_registry(new_template=nil)
+    @doc = Rexle.new(new_template || @template)
   end
 
   alias :reset_registry :initialise_registry
+  alias :initialize_registry :initialise_registry
 
+  # Set the key by passing in the path and the value
+  # example: set_key 'app/gtd/funday', 'friday'
+  #
   def set_key(path, value)
-
+    
+    # if the 1st element doesn't exist create it
+    e = path.split('/',2).first
+    @doc.root.add_element Rexle::Element.new(e) unless @doc.root.element e
     create_path = find_path(path)  
 
     if not create_path.empty? then
@@ -31,34 +41,72 @@ class XMLRegistry
     
     add_value(path, value)  
   end
-
+  
+  # get the key value by passing the path
+  # example: get_key('app/gtd/funday').value #=> 'friday'
+  #
+  # returns the value as a Rexle::Element
+  #
   def get_key(path)
     @doc.root.element path
   end
   
+  # get several keys using a Rexle XPath
+  # example: get_key('//funday') #=> [<funday>tuesday</funday>,<funday>friday</funday>]
+  #
+  # returns an array of 0 or more Rexle elements
+  #
   def get_keys(path)
     @doc.root.xpath path
   end        
 
+  # delete the key at the specified path
+  # example: delete_key 'app/gtd/funday'
+  #
+  #
   def delete_key(path)
     @doc.root.delete path    
   end
 
+  # return the registry as an XML document
+  # example: puts reg.to_xml pretty: true
+  #
   def to_xml(options={})
     @doc.xml options
   end
 
   alias :display_xml :to_xml
 
+  # load a new registry xml document replacing the existing registry
+  #
   def load_xml(s='')      
     @doc = Rexle.new(read(s))          
     self
   end
 
+  # save the registry to the specified file path
+  #
   def save(s)
     File.open(s, 'w'){|f| f.write @doc.xml}
   end
 
+  # import a registry hive from a string in registry format
+  #
+  # example:
+  #
+  #s =<<REG
+#[app/app1]
+#"admin"="jrobertson"
+#"pin-no"="1234"
+#
+#[app/app2]
+#"admin"="dsmith"
+#"pin-no"="4321"
+#REG
+#
+#reg = XMLRegistry.new 
+#reg.import s 
+  #
   def import(s)      
     reg_buffer = read(s)
 
@@ -71,6 +119,10 @@ class XMLRegistry
     end
   end
 
+  # Export the registry to file if the filepath is specified. Regardless, 
+  # the registry will be returned as a string in the registry 
+  # export format.
+  #
   def export(s=nil)
     reg = print_scan(@doc.root).join("\n")
     File.open(s){|f| f.write reg} if s
