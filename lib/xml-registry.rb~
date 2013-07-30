@@ -87,7 +87,7 @@ class XMLRegistry
   # save the registry to the specified file path
   #
   def save(s)
-    File.open(s, 'w'){|f| f.write @doc.xml}
+    File.open(s, 'w'){|f| f.write @doc.xml pretty: true}
   end
 
   # import a registry hive from a string in registry format

@@ -76,6 +76,10 @@ class XMLRegistry
   end
 
   alias :display_xml :to_xml
+  
+  def xml(options={})
+    @doc.xml options
+  end  
 
   # load a new registry xml document replacing the existing registry
   #
