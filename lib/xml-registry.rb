@@ -3,6 +3,7 @@
 # file: xml-registry.rb
 
 require 'rexle'
+require 'rxfhelper'
 
 class XMLRegistry
 
@@ -28,7 +29,8 @@ class XMLRegistry
   # example: set_key 'app/gtd/funday', 'friday'
   #
   def set_key(path, value)
-    
+
+    puts "set_key : path: %s value: %s" % [path,value]
     # if the 1st element doesn't exist create it
     e = path.split('/',2).first
     @doc.root.add_element Rexle::Element.new(e) unless @doc.root.element e
@@ -112,17 +114,20 @@ class XMLRegistry
 #reg.import s 
   #
   def import(s)      
-    reg_buffer = read(s)
+    
+    r = RXFHelper.read(s)
+    reg_buffer = r.first
+    raise "read file error" unless reg_buffer
 
-    if  s.strip[/^\[/] then
+    if  reg_buffer.strip[/^\[/] then
 
       reg_items = reg_buffer.gsub(/\n/,'').split(/(?=\[.[^\]]+\])/).map do |x| 
         [x[/^\[(.[^\]]+)\]/,1], Hash[*($').scan(/"([^"]+)"="(.[^"]*)"/).flatten]]
       end
       
     else
-      
-      reg_items = s.split(/(?=^[^:]+$)/).map do |raw_section|
+
+      reg_items = reg_buffer.split(/(?=^[^:]+$)/).map do |raw_section|
 
         lines = raw_section.lines.to_a
         next if lines.first.strip.empty?
@@ -133,7 +138,7 @@ class XMLRegistry
       reg_items.compact!
       
     end
-        
+
     reg_items.each do |path, items|
       items.each {|k,value| self.set_key("%s/%s" % [path,k], value)}
     end
@@ -205,3 +210,5 @@ class XMLRegistry
   end
 
 end
+
+
