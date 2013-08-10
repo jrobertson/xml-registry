@@ -1,9 +1,3 @@
-#!/usr/bin/env ruby
-
-# file: xml-registry.rb
-
-require 'rexle'
-
 class XMLRegistry
 
   attr_reader :doc
@@ -114,10 +108,26 @@ class XMLRegistry
   def import(s)      
     reg_buffer = read(s)
 
-    reg_items = reg_buffer.gsub(/\n/,'').split(/(?=\[.[^\]]+\])/).map do |x| 
-      [x[/^\[(.[^\]]+)\]/,1], Hash[*($').scan(/"([^"]+)"="(.[^"]*)"/).flatten]]
-    end
+    if  s.strip[/^\[/] then
 
+      reg_items = reg_buffer.gsub(/\n/,'').split(/(?=\[.[^\]]+\])/).map do |x| 
+        [x[/^\[(.[^\]]+)\]/,1], Hash[*($').scan(/"([^"]+)"="(.[^"]*)"/).flatten]]
+      end
+      
+    else
+      
+      reg_items = s.split(/(?=^[^:]+$)/).map do |raw_section|
+
+        lines = raw_section.lines.to_a
+        next if lines.first.strip.empty?
+        path = lines.shift.chomp
+        [path, Hash[lines.map{|x| x.split(':',2).map(&:strip)}]]
+      end
+      
+      reg_items.compact!
+      
+    end
+        
     reg_items.each do |path, items|
       items.each {|k,value| self.set_key("%s/%s" % [path,k], value)}
     end
@@ -189,5 +199,3 @@ class XMLRegistry
   end
 
 end
-
-

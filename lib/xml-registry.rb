@@ -1,3 +1,9 @@
+#!/usr/bin/env ruby
+
+# file: xml-registry.rb
+
+require 'rexle'
+
 class XMLRegistry
 
   attr_reader :doc
