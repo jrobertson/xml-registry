@@ -50,7 +50,9 @@ class XMLRegistry
   # returns the value as a Rexle::Element
   #
   def get_key(path)
-    @doc.root.element path
+    key = @doc.root.element path
+    raise ("xml-registry: key %s not found" % path) unless key
+    key
   end
   
   # get several keys using a Rexle XPath
@@ -86,7 +88,7 @@ class XMLRegistry
   # load a new registry xml document replacing the existing registry
   #
   def load_xml(s='')      
-    @doc = Rexle.new(read(s))          
+    @doc = Rexle.new(RXFHelper.read(s)[0])          
     self
   end
 
@@ -180,16 +182,6 @@ class XMLRegistry
     key_builder("#{parent_path}/#{key}", create_path) unless create_path.empty?
   end
 
-  def read(s)
-    if s[/^https?:\/\//] then
-      buffer = open(s, "UserAgent" => "Ruby Registry-reader").read
-    elsif File.exists? s then
-      buffer = File.open(s).read
-    else
-      buffer = s
-    end
-  end
-
   def print_scan(node, parent=[])
     out = []
     parent << node.name 
@@ -210,5 +202,4 @@ class XMLRegistry
   end
 
 end
-
 
