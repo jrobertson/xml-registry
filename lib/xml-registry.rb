@@ -30,7 +30,6 @@ class XMLRegistry
   #
   def set_key(path, value)
 
-    puts "set_key : path: %s value: %s" % [path,value]
     # if the 1st element doesn't exist create it
     e = path.split('/',2).first
     @doc.root.add_element Rexle::Element.new(e) unless @doc.root.element e
@@ -43,6 +42,10 @@ class XMLRegistry
     
     add_value(path, value)  
   end
+
+  def key[]=(path, val)
+    self.set_key key, val
+  end
   
   # get the key value by passing the path
   # example: get_key('app/gtd/funday').value #=> 'friday'
@@ -54,6 +57,10 @@ class XMLRegistry
     raise ("xml-registry: key %s not found" % path) unless key
     key
   end
+
+  def key[](path)
+    self.doc.root.element path
+  end
   
   # get several keys using a Rexle XPath
   # example: get_key('//funday') #=> [<funday>tuesday</funday>,<funday>friday</funday>]
@@ -63,6 +70,10 @@ class XMLRegistry
   def get_keys(path)
     @doc.root.xpath path
   end        
+
+  def keys[](path)
+    self.get_keys path
+  end
 
   # delete the key at the specified path
   # example: delete_key 'app/gtd/funday'
