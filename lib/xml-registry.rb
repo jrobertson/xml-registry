@@ -12,7 +12,7 @@ class XMLRegistry
   
   def initialize(template = '<root></root>')
     super()
-    @template = template
+    @template, _ = RXFHelper.read(template)
     @doc = Rexle.new(@template)
   end
 

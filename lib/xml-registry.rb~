@@ -5,6 +5,7 @@
 require 'rexle'
 require 'rxfhelper'
 
+
 class XMLRegistry
 
   attr_reader :doc
@@ -161,6 +162,10 @@ class XMLRegistry
     reg = print_scan(@doc.root).join("\n")
     File.open(s){|f| f.write reg} if s
     reg
+  end
+
+  def xpath(s)
+    @doc.root.xpath s
   end
 
   private
