@@ -3,7 +3,7 @@
 # file: xml-registry.rb
 
 #require 'rexle'
-#require 'rxfhelper'
+require 'rxfhelper'
 require 'simple-config'
 
 

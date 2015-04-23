@@ -3,7 +3,7 @@
 # file: xml-registry.rb
 
 #require 'rexle'
-#require 'rxfhelper'
+require 'rxfhelper'
 require 'simple-config'
 
 
@@ -55,13 +55,36 @@ class XMLRegistry
   # returns the value as a Rexle::Element
   #
   def get_key(path)
+    
     key = @doc.root.element path
     raise ("xml-registry: key %s not found" % path) unless key
+    
+    key.instance_eval { 
+      @path = path 
+
+      def hashify(e)
+
+        v = if e.has_elements? then 
+          e.elements.inject({}) do |r, x|
+            r.merge hashify(x)
+          end
+        else
+          e.text
+        end
+
+        {e.name => v}
+      end    
+    
+      def to_config()                    
+        SimpleConfig.new(hashify(self), attributes: {key: @path})
+      end    
+    }
+    
     key
   end
   
   # get several keys using a Rexle XPath
-  # example: get_key('//funday') #=> [<funday>tuesday</funday>,<funday>friday</funday>]
+  # example: get_keys('//funday') #=> [<funday>tuesday</funday>,<funday>friday</funday>]
   #
   # returns an array of 0 or more Rexle elements
   #
