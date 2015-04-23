@@ -62,11 +62,11 @@ class XMLRegistry
     key.instance_eval { 
       @path = path 
 
-      def hashify(e)
+      def to_h(e)
 
         v = if e.has_elements? then 
           e.elements.inject({}) do |r, x|
-            r.merge hashify(x)
+            r.merge to_h(x)
           end
         else
           e.text
@@ -76,7 +76,7 @@ class XMLRegistry
       end    
     
       def to_config()                    
-        SimpleConfig.new(hashify(self), attributes: {key: @path})
+        SimpleConfig.new(to_h(self), attributes: {key: @path})
       end    
     }
     
@@ -238,4 +238,3 @@ class XMLRegistry
   end
 
 end
-
