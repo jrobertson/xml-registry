@@ -2,8 +2,9 @@
 
 # file: xml-registry.rb
 
-require 'rexle'
-require 'rxfhelper'
+#require 'rexle'
+#require 'rxfhelper'
+require 'simple-config'
 
 
 class XMLRegistry
@@ -12,7 +13,7 @@ class XMLRegistry
   
   def initialize(template = '<root></root>')
     super()
-    @template = template
+    @template, _ = RXFHelper.read(template)
     @doc = Rexle.new(@template)
   end
 
