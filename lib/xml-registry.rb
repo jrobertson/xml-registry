@@ -3,7 +3,7 @@
 # file: xml-registry.rb
 
 #require 'rexle'
-require 'rxfhelper'
+#require 'rxfhelper'
 require 'simple-config'
 
 
@@ -78,6 +78,10 @@ class XMLRegistry
       def to_config()                    
         SimpleConfig.new(to_h(self), attributes: {key: @path})
       end    
+    
+      def to_kvx()                    
+        Kvx.new(to_h(self), attributes: {key: @path})
+      end        
     }
     
     key
