@@ -1,10 +1,10 @@
 Gem::Specification.new do |s|
   s.name = 'xml-registry'
-  s.version = '0.4.4'
+  s.version = '0.5.0'
   s.summary = 'xml-registry'
   s.authors = ['James Robertson']
-  s.files = Dir['lib/**/*.rb'] 
-  s.add_runtime_dependency('simple-config', '~> 0.5', '>=0.5.0')
+  s.files = Dir['lib/xml-registry.rb'] 
+  s.add_runtime_dependency('simple-config', '~> 0.6', '>=0.6.1')
   s.signing_key = '../privatekeys/xml-registry.pem'
   s.cert_chain  = ['gem-public_cert.pem']
   s.license = 'MIT'

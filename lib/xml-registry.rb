@@ -34,14 +34,17 @@ class XMLRegistry
 
     # if the 1st element doesn't exist create it
     e = path.split('/',2).first
+
     @doc.root.add_element Rexle::Element.new(e) unless @doc.root.element e
     create_path = find_path(path)  
-
+    
     if not create_path.empty? then
-      parent_path = (path.split('/') - create_path.reverse).join('/')
+
+      a = path.split('/').map {|x| x.to_i.to_s == x ? x.prepend('x') : x}
+      parent_path = (a - create_path.reverse).join('/')
       key_builder(parent_path, create_path)
     end
-    
+
     add_value(path, value)  
   end
 
@@ -199,20 +202,28 @@ class XMLRegistry
   private
 
   def add_key(path='app', key='untitled')
+
     node = @doc.root.element path
     r = node.add_element Rexle::Element.new(key)
     r
+    
   end
 
   def add_value(key, value)
-    @doc.root.element(key).text = value
+    s = key.split('/').map {|x| x.to_i.to_s == x ? x.prepend('x') : x}.join '/'
+    @doc.root.element(s).text = value
   end
 
   def find_path(path, create_path=[])
 
     return create_path if !@doc.root.xpath(path).empty?
     apath = path.split('/')
-    create_path << apath.pop
+
+    x = apath.pop
+
+    x.prepend 'x' if x.to_i.to_s == x    
+    create_path << x
+
     find_path(apath.join('/'), create_path)
   end
 
