@@ -58,7 +58,7 @@ class XMLRegistry
   end
 
   def []=(path, val)
-    s = path.split('/').map {|x| x.is_number? ? x.prepend('x') : x}.join '/'
+    s = path.split('/').map {|x| x[0].is_number? ? x.prepend('x') : x}.join '/'
     self.set_key(s, val)
   end
   
@@ -68,7 +68,7 @@ class XMLRegistry
   # returns the value as a Rexle::Element
   #
   def get_key(path)
-    
+    puts 'inside get_key'
     key = @doc.root.element path
     raise ("xml-registry: key %s not found" % path) unless key
     
