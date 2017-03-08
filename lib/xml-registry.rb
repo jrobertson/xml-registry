@@ -68,7 +68,7 @@ class XMLRegistry
   # returns the value as a Rexle::Element
   #
   def get_key(path)
-    puts 'inside get_key'
+
     key = @doc.root.element path
     raise ("xml-registry: key %s not found" % path) unless key
     
@@ -95,6 +95,10 @@ class XMLRegistry
       def to_kvx()                    
         Kvx.new(to_h(self), attributes: {key: @path})
       end        
+    
+      def to_os()
+        OpenStruct.new(to_h(self).first.last)
+      end
     }
     
     key
