@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'xml-registry'
-  s.version = '0.5.3'
+  s.version = '0.5.4'
   s.summary = 'xml-registry'
   s.authors = ['James Robertson']
   s.files = Dir['lib/xml-registry.rb'] 

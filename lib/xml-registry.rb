@@ -198,6 +198,8 @@ class XMLRegistry
     reg_items.each do |path, items|
       items.each {|k,value| self.set_key("%s/%s" % [path,k], value)}
     end
+    
+    :import
   end
 
   # Export the registry to file if the filepath is specified. Regardless, 
