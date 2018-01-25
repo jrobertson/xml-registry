@@ -149,7 +149,7 @@ class XMLRegistry
   # save the registry to the specified file path
   #
   def save(s)
-    File.open(s, 'w'){|f| f.write @doc.xml pretty: true}
+    RXFHelper.write s, @doc.xml(pretty: true)
   end
 
   # import a registry hive from a string in registry format
@@ -208,7 +208,8 @@ class XMLRegistry
   #
   def export(s=nil)
     reg = print_scan(@doc.root).join("\n")
-    File.open(s){|f| f.write reg} if s
+    # jr 250118 File.open(s){|f| f.write reg} if s
+    RXFHelper.write(s, reg) if s
     reg
   end
 
