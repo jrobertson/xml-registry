@@ -23,7 +23,9 @@ class XMLRegistry
 
   attr_reader :doc
   
-  def initialize(template = '<root></root>')
+  def initialize(template = '<root></root>', debug: false)
+    
+    @debug = debug
     super()
     @template, _ = RXFHelper.read(template)
     @doc = Rexle.new(@template)
@@ -181,6 +183,25 @@ class XMLRegistry
         [x[/^\[(.[^\]]+)\]/,1], Hash[*($').scan(/"([^"]+)"="(.[^"]*)"/).flatten]]
       end
       
+    elsif reg_buffer.strip.lines.grep(/^\s+\w/).any? 
+
+      puts 'hierachical import' if @debug
+      doc = LineTree.new(reg_buffer).to_doc
+      
+      reg_items = []
+      
+      doc.root.each_recursive do |e|
+        
+        puts 'e: ' + e.inspect if @debug
+        if e.is_a?(Rexle::Element) and e.children.length < 2 then
+          
+          reg_items << [e.backtrack.to_xpath.sub(/^root\//,'')\
+                        .sub(/\/[^\/]+$/,''), {e.name => e.text }]
+          
+        end
+          
+      end      
+      
     else
 
       reg_items = reg_buffer.split(/(?=^[^:]+$)/).map do |raw_section|
@@ -195,6 +216,7 @@ class XMLRegistry
       
     end
 
+    puts 'reg_items: ' + reg_items.inspect if @debug
     reg_items.each do |path, items|
       items.each {|k,value| self.set_key("%s/%s" % [path,k], value)}
     end
