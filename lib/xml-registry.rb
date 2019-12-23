@@ -208,7 +208,7 @@ class XMLRegistry
 
         lines = raw_section.lines.to_a
         next if lines.first.strip.empty?
-        path = lines.shift.chomp
+        path = lines.shift.rstrip
         [path, Hash[lines.map{|x| x.split(':',2).map(&:strip)}]]
       end
       
