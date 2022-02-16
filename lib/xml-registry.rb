@@ -8,13 +8,13 @@ require 'simple-config'
 
 
 module NumberCheck
-  
+
   refine String do
-    
+
     def is_number?
       self.to_i.to_s == self
     end
-    
+
   end
 end
 
@@ -22,9 +22,9 @@ class XMLRegistry
   using NumberCheck
 
   attr_reader :doc
-  
+
   def initialize(template = '<root></root>', debug: false)
-    
+
     @debug = debug
     super()
     @template, _ = RXFHelper.read(template)
@@ -49,21 +49,21 @@ class XMLRegistry
     # if the 1st element doesn't exist create it
     e = path.split('/',2).first
     @doc.root.add_element Rexle::Element.new(e) unless @doc.root.element e
-    create_path = find_path(path)  
+    create_path = find_path(path)
 
     if not create_path.empty? then
       parent_path = (path.split('/') - create_path.reverse).join('/')
       key_builder(parent_path, create_path)
     end
-    
-    add_value(path, value)  
+
+    add_value(path, value)
   end
 
   def []=(path, val)
     s = path.split('/').map {|x| x[0].is_number? ? x.prepend('x') : x}.join '/'
     self.set_key(s, val)
   end
-  
+
   # get the key value by passing the path
   # example: get_key('app/gtd/funday').value #=> 'friday'
   #
@@ -73,13 +73,13 @@ class XMLRegistry
 
     key = @doc.root.element path
     raise ("xml-registry: key %s not found" % path) unless key
-    
-    key.instance_eval { 
-      @path = path 
+
+    key.instance_eval {
+      @path = path
 
       def to_h(e)
 
-        v = if e.has_elements? then 
+        v = if e.has_elements? then
           e.elements.inject({}) do |r, x|
             r.merge to_h(x)
           end
@@ -88,24 +88,24 @@ class XMLRegistry
         end
 
         {e.name => v}
-      end    
-    
-      def to_config()                    
+      end
+
+      def to_config()
         SimpleConfig.new(to_h(self), attributes: {key: @path})
-      end    
-    
-      def to_kvx()                    
+      end
+
+      def to_kvx()
         Kvx.new(to_h(self), attributes: {key: @path})
-      end        
-    
+      end
+
       def to_os()
         OpenStruct.new(to_h(self).first.last)
       end
     }
-    
+
     key
   end
-  
+
   # get several keys using a Rexle XPath
   # example: get_keys('//funday') #=> [<funday>tuesday</funday>,<funday>friday</funday>]
   #
@@ -113,7 +113,7 @@ class XMLRegistry
   #
   def get_keys(path)
     @doc.root.xpath(path)
-  end        
+  end
 
   def [](path)
     s = path.split('/').map {|x| x.is_number? ? x.prepend('x') : x}.join '/'
@@ -125,7 +125,7 @@ class XMLRegistry
   #
   #
   def delete_key(path)
-    @doc.root.delete path    
+    @doc.root.delete path
   end
 
   # return the registry as an XML document
@@ -136,15 +136,15 @@ class XMLRegistry
   end
 
   alias :display_xml :to_xml
-  
+
   def xml(options={})
     @doc.root.xml options
-  end  
+  end
 
   # load a new registry xml document replacing the existing registry
   #
-  def load_xml(s='')      
-    @doc = Rexle.new(RXFHelper.read(s)[0])          
+  def load_xml(s='')
+    @doc = Rexle.new(RXFHelper.read(s)[0].force_encoding("UTF-8"))
     self
   end
 
@@ -168,40 +168,40 @@ class XMLRegistry
 #"pin-no"="4321"
 #REG
 #
-#reg = XMLRegistry.new 
-#reg.import s 
+#reg = XMLRegistry.new
+#reg.import s
   #
-  def import(s)      
-    
+  def import(s)
+
     r = RXFHelper.read(s)
     reg_buffer = r.first
     raise "read file error" unless reg_buffer
 
     if  reg_buffer.strip[/^\[/] then
 
-      reg_items = reg_buffer.gsub(/\n/,'').split(/(?=\[.[^\]]+\])/).map do |x| 
+      reg_items = reg_buffer.gsub(/\n/,'').split(/(?=\[.[^\]]+\])/).map do |x|
         [x[/^\[(.[^\]]+)\]/,1], Hash[*($').scan(/"([^"]+)"="(.[^"]*)"/).flatten]]
       end
-      
-    elsif reg_buffer.strip.lines.grep(/^\s+\w/).any? 
+
+    elsif reg_buffer.strip.lines.grep(/^\s+\w/).any?
 
       puts 'hierachical import' if @debug
       doc = LineTree.new(reg_buffer).to_doc
-      
+
       reg_items = []
-      
+
       doc.root.each_recursive do |e|
-        
+
         puts 'e: ' + e.inspect if @debug
         if e.is_a?(Rexle::Element) and e.children.length < 2 then
-          
+
           reg_items << [e.backtrack.to_xpath.sub(/^root\//,'')\
                         .sub(/\/[^\/]+$/,''), {e.name => e.text }]
-          
+
         end
-          
-      end      
-      
+
+      end
+
     else
 
       reg_items = reg_buffer.split(/(?=^[^:]+$)/).map do |raw_section|
@@ -211,21 +211,21 @@ class XMLRegistry
         path = lines.shift.rstrip
         [path, Hash[lines.map{|x| x.split(':',2).map(&:strip)}]]
       end
-      
+
       reg_items.compact!
-      
+
     end
 
     puts 'reg_items: ' + reg_items.inspect if @debug
     reg_items.each do |path, items|
       items.each {|k,value| self.set_key("%s/%s" % [path,k], value)}
     end
-    
+
     :import
   end
 
-  # Export the registry to file if the filepath is specified. Regardless, 
-  # the registry will be returned as a string in the registry 
+  # Export the registry to file if the filepath is specified. Regardless,
+  # the registry will be returned as a string in the registry
   # export format.
   #
   def export(s=nil)
@@ -267,21 +267,21 @@ class XMLRegistry
 
   def print_scan(node, parent=[])
     out = []
-    parent << node.name 
+    parent << node.name
     items = []
 
     node.elements.each do |e|
       if e.has_elements? then
-        out << print_scan(e, parent.clone) 
+        out << print_scan(e, parent.clone)
       else
         items << [e.name, e.text]
       end
-    end  
-    if parent.length > 1 and items.length > 0 then
-      out << "[%s]\n%s\n" % [parent[1..-1].join("/"), 
-                            items.map {|x| "\"%s\"=\"%s\"" % x}.join("\n")]    
     end
-    out  
+    if parent.length > 1 and items.length > 0 then
+      out << "[%s]\n%s\n" % [parent[1..-1].join("/"),
+                            items.map {|x| "\"%s\"=\"%s\"" % x}.join("\n")]
+    end
+    out
   end
 
 end
