@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = 'xml-registry'
-  s.version = '0.7.1'
+  s.version = '0.8.0'
   s.summary = 'The XML registry can be used to store or retrieve ' + 
       'app settings etc. in an XML document.'
   s.authors = ['James Robertson']

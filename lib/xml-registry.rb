@@ -2,9 +2,11 @@
 
 # file: xml-registry.rb
 
-#require 'rexle'
-#require 'rxfhelper'
+require 'rexle'
+require 'kvx'
+require 'ostruct'
 require 'simple-config'
+require 'rxfreadwrite'
 
 
 module NumberCheck
@@ -20,6 +22,7 @@ end
 
 class XMLRegistry
   using NumberCheck
+  include RXFReadWriteModule
 
   attr_reader :doc
 
@@ -27,7 +30,7 @@ class XMLRegistry
 
     @debug = debug
     super()
-    @template, _ = RXFHelper.read(template)
+    @template, _ = RXFReader.read(template)
     @doc = Rexle.new(@template)
   end
 
@@ -144,14 +147,14 @@ class XMLRegistry
   # load a new registry xml document replacing the existing registry
   #
   def load_xml(s='')
-    @doc = Rexle.new(RXFHelper.read(s)[0].force_encoding("UTF-8"))
+    @doc = Rexle.new(RXFReader.read(s)[0].force_encoding("UTF-8"))
     self
   end
 
   # save the registry to the specified file path
   #
   def save(s)
-    RXFHelper.write s, @doc.xml(pretty: true)
+    FileX.write s, @doc.xml(pretty: true)
   end
 
   # import a registry hive from a string in registry format
@@ -173,7 +176,7 @@ class XMLRegistry
   #
   def import(s)
 
-    r = RXFHelper.read(s)
+    r = RXFReader.read(s)
     reg_buffer = r.first
     raise "read file error" unless reg_buffer
 
@@ -231,7 +234,7 @@ class XMLRegistry
   def export(s=nil)
     reg = print_scan(@doc.root).join("\n")
     # jr 250118 File.open(s){|f| f.write reg} if s
-    RXFHelper.write(s, reg) if s
+    FileX.write(s, reg) if s
     reg
   end
 
